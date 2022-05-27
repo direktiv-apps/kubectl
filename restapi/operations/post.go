@@ -75,7 +75,7 @@ type PostBody struct {
 	Files []apps.DirektivFile `json:"files"`
 
 	// Base64 kubectl.yaml file. If not set `kubectl.yaml` will be used. This can be provided via Direktiv files.
-	// Example: kubeconfig.yaml
+	// Example: tLS0tCk1IY0NBUUVFSUlQN...Fa0luUW1ZbGovY0lIbjQwakZ1eUUxe
 	Kubeconfig string `json:"kubeconfig,omitempty"`
 }
 

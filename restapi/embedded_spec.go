@@ -38,11 +38,11 @@ func init() {
         "tools"
       ],
       "container": "direktiv/kubectl",
-      "issues": null,
+      "issues": "https://github.com/direktiv-apps/kubectl/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
-      "long-description": "This function asllows to run kubectl commands in Direktiv. It uses ` + "`" + `kubectl.yaml` + "`" + ` in the working directory for authentication.\nThis file can be provided in the payload as base64 string or in ` + "`" + `files` + "`" + ` as well as via Direktiv files for actions.",
-      "maintainer": null,
-      "url": null
+      "long-description": "This function allows to run kubectl commands in Direktiv. It uses ` + "`" + `kubectl.yaml` + "`" + ` in the working directory for authentication.\nThis file can be provided in the payload as base64 string or in ` + "`" + `files` + "`" + ` as well as via Direktiv files for actions.",
+      "maintainer": "[direktiv.io](https://www.direktiv.io)",
+      "url": "https://github.com/direktiv-apps/kubectl"
     }
   },
   "paths": {
@@ -105,7 +105,7 @@ func init() {
                 "kubeconfig": {
                   "description": "Base64 kubectl.yaml file. If not set ` + "`" + `kubectl.yaml` + "`" + ` will be used. This can be provided via Direktiv files.",
                   "type": "string",
-                  "example": "kubeconfig.yaml"
+                  "example": "tLS0tCk1IY0NBUUVFSUlQN...Fa0luUW1ZbGovY0lIbjQwakZ1eUUxe"
                 }
               }
             }
@@ -205,8 +205,16 @@ func init() {
         },
         "x-direktiv-examples": [
           {
-            "content": "- id: req\n     type: action\n     action:\n       function: kubectl",
-            "title": "Basic"
+            "content": "- id: kubectl \n      type: action\n      action:\n        secrets: [\"kubectl\"]\n        function: get\n        input: \n          kubeconfig: jq(.secrets.kubectl | @base64)\n          commands:\n          - command: kubectl --insecure-skip-tls-verify --server=https://myserver:6443/ -o json get pods",
+            "title": "Kubectl with Secrets"
+          },
+          {
+            "content": "- id: get-kubeconfig\n      type: getter\n      variables:\n      - key: k3s.yaml\n        scope: workflow\n      transition: kubectl\n    - id: kubectl \n      type: action\n      action:\n        secrets: [\"k3s\"]\n        function: get\n        input: \n          kubeconfig: jq(.var.\"k3s.yaml\")\n          commands:\n          - command: kubectl -o json get pods",
+            "title": "Kubectl with Variable"
+          },
+          {
+            "content": "- id: kubectl \n      type: action\n      action:\n        secrets: [\"k3s\"]\n        function: get\n        files:\n        - key: k3s.yaml\n          scope: workflow\n          as: kubectl.yaml\n        input: \n          kubeconfig: jq(.secrets.k3s | @base64)\n          commands:\n          - command: kubectl --server=https://myserver:6443/ -o json get pods",
+            "title": "Kubectl with Direktiv File"
           }
         ],
         "x-direktiv-function": "functions:\n  - id: kubectl\n    image: direktiv/kubectl:1.0\n    type: knative-workflow"
@@ -279,11 +287,11 @@ func init() {
         "tools"
       ],
       "container": "direktiv/kubectl",
-      "issues": null,
+      "issues": "https://github.com/direktiv-apps/kubectl/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
-      "long-description": "This function asllows to run kubectl commands in Direktiv. It uses ` + "`" + `kubectl.yaml` + "`" + ` in the working directory for authentication.\nThis file can be provided in the payload as base64 string or in ` + "`" + `files` + "`" + ` as well as via Direktiv files for actions.",
-      "maintainer": null,
-      "url": null
+      "long-description": "This function allows to run kubectl commands in Direktiv. It uses ` + "`" + `kubectl.yaml` + "`" + ` in the working directory for authentication.\nThis file can be provided in the payload as base64 string or in ` + "`" + `files` + "`" + ` as well as via Direktiv files for actions.",
+      "maintainer": "[direktiv.io](https://www.direktiv.io)",
+      "url": "https://github.com/direktiv-apps/kubectl"
     }
   },
   "paths": {
@@ -325,7 +333,7 @@ func init() {
                 "kubeconfig": {
                   "description": "Base64 kubectl.yaml file. If not set ` + "`" + `kubectl.yaml` + "`" + ` will be used. This can be provided via Direktiv files.",
                   "type": "string",
-                  "example": "kubeconfig.yaml"
+                  "example": "tLS0tCk1IY0NBUUVFSUlQN...Fa0luUW1ZbGovY0lIbjQwakZ1eUUxe"
                 }
               }
             }
@@ -413,8 +421,16 @@ func init() {
         },
         "x-direktiv-examples": [
           {
-            "content": "- id: req\n     type: action\n     action:\n       function: kubectl",
-            "title": "Basic"
+            "content": "- id: kubectl \n      type: action\n      action:\n        secrets: [\"kubectl\"]\n        function: get\n        input: \n          kubeconfig: jq(.secrets.kubectl | @base64)\n          commands:\n          - command: kubectl --insecure-skip-tls-verify --server=https://myserver:6443/ -o json get pods",
+            "title": "Kubectl with Secrets"
+          },
+          {
+            "content": "- id: get-kubeconfig\n      type: getter\n      variables:\n      - key: k3s.yaml\n        scope: workflow\n      transition: kubectl\n    - id: kubectl \n      type: action\n      action:\n        secrets: [\"k3s\"]\n        function: get\n        input: \n          kubeconfig: jq(.var.\"k3s.yaml\")\n          commands:\n          - command: kubectl -o json get pods",
+            "title": "Kubectl with Variable"
+          },
+          {
+            "content": "- id: kubectl \n      type: action\n      action:\n        secrets: [\"k3s\"]\n        function: get\n        files:\n        - key: k3s.yaml\n          scope: workflow\n          as: kubectl.yaml\n        input: \n          kubeconfig: jq(.secrets.k3s | @base64)\n          commands:\n          - command: kubectl --server=https://myserver:6443/ -o json get pods",
+            "title": "Kubectl with Direktiv File"
           }
         ],
         "x-direktiv-function": "functions:\n  - id: kubectl\n    image: direktiv/kubectl:1.0\n    type: knative-workflow"
