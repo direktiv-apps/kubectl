@@ -1,0 +1,224 @@
+swagger: "2.0"
+info:
+  description: Run kubectl commands in Direktiv.
+  title: kubectl
+  version: "1.0"
+  x-direktiv-meta:
+    container: direktiv/kubectl
+    maintainer: |-
+      [direktiv.io](https://www.direktiv.io)
+    issues: https://github.com/direktiv-apps/kubectl/issues
+    url: https://github.com/direktiv-apps/kubectl 
+    categories:
+    - cloud
+    - tools
+    license: |-
+      [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
+    long-description: |-
+      This function allows to run kubectl commands in Direktiv. It uses `kubectl.yaml` in the working directory for authentication.
+      This file can be provided in the payload as base64 string or in `files` as well as via Direktiv files for actions.
+consumes:
+- application/json
+produces:
+- application/json
+schemes:
+- http
+paths:
+  /: 
+    delete:
+      parameters:
+        - name: Direktiv-ActionID
+          in: header
+          type: string
+          description: |
+            On cancel Direktiv sends a DELETE request to
+            the action with id in the header
+      x-direktiv:
+        cancel: echo 'cancel {{ .DirektivActionID }}'
+      responses:
+        200:
+    post:
+      parameters:
+        - name: Direktiv-ActionID
+          in: header
+          type: string
+          description: |
+            direktiv action id is an UUID. 
+            For development it can be set to 'development'
+        - name: Direktiv-TempDir
+          in: header
+          type: string
+          description: |
+            direktiv temp dir is the working directory for that request
+            For development it can be set to e.g. '/tmp'
+        - name: body
+          in: body
+          schema:
+            type: object
+            properties:
+              kubeconfig:
+                type: string
+                example: tLS0tCk1IY0NBUUVFSUlQN...Fa0luUW1ZbGovY0lIbjQwakZ1eUUxe
+                description: Base64 kubectl.yaml file. If not set `kubectl.yaml` will be used. This can be provided via Direktiv files.
+              files:
+                type: array
+                items:
+                  $ref: '#/definitions/direktivFile'
+                description: File to create before running commands. This can include a `kubectl.yaml` file from secrets.
+              commands:
+                type: array
+                description: Array of commands.
+                items:
+                  type: object
+                  properties:
+                    command:
+                      type: string
+                      description: Command to run
+                      example: kubectl version --client=true -o json
+                    silent: 
+                      type: boolean
+                      description: If set to false the command will not print output to logs.
+                      default: false
+                    print: 
+                      type: boolean
+                      description: If set to false the command will not print the full command with arguments to logs.
+                      default: true
+                    continue: 
+                      type: boolean
+                      description: Stops excecution if command fails, otherwise proceeds with next command 
+      # direktiv code generation is configured here
+      x-direktiv-function: |-
+        functions:
+          - id: kubectl
+            image: direktiv/kubectl:1.0
+            type: knative-workflow
+      x-direktiv-examples:
+        - title: Kubectl with Secrets
+          content: |-
+            - id: kubectl 
+                  type: action
+                  action:
+                    secrets: ["kubectl"]
+                    function: get
+                    input: 
+                      kubeconfig: jq(.secrets.kubectl | @base64)
+                      commands:
+                      - command: kubectl --insecure-skip-tls-verify --server=https://myserver:6443/ -o json get pods
+        - title: Kubectl with Variable
+          content: |-
+            - id: get-kubeconfig
+                  type: getter
+                  variables:
+                  - key: k3s.yaml
+                    scope: workflow
+                  transition: kubectl
+                - id: kubectl 
+                  type: action
+                  action:
+                    secrets: ["k3s"]
+                    function: get
+                    input: 
+                      kubeconfig: jq(.var."k3s.yaml")
+                      commands:
+                      - command: kubectl -o json get pods
+        - title: Kubectl with Direktiv File
+          content: |-
+            - id: kubectl 
+                  type: action
+                  action:
+                    secrets: ["k3s"]
+                    function: get
+                    files:
+                    - key: k3s.yaml
+                      scope: workflow
+                      as: kubectl.yaml
+                    input: 
+                      kubeconfig: jq(.secrets.k3s | @base64)
+                      commands:
+                      - command: kubectl --server=https://myserver:6443/ -o json get pods
+      x-direktiv:  
+        cmds:
+        - action: exec
+          exec: |-
+            {{- if empty .Kubeconfig }}
+            echo "no kubeconfig in payload"
+            {{- else }}
+            bash -c "echo {{ .Kubeconfig }} | base64 -d > kubectl.yaml"
+            {{- end }}
+          silent: true
+          print: false
+        - action: foreach
+          loop: .Commands 
+          exec: '{{ .Item.Command }}'
+          silent: '{{ .Item.Silent }}'
+          print: '{{ .Item.Print }}'
+          continue: '{{ .Item.Continue }}'
+          env: ["KUBECONFIG={{- .DirektivDir }}/kubectl.yaml"]
+        output: |
+          {
+            "kubectl": {{ index . 1 | toJson }}
+          }
+      x-direktiv-errors:
+        io.direktiv.command.error: Command execution failed
+        io.direktiv.output.error: Template error for output generation of the service
+        io.direktiv.ri.error: Can not create information object from request
+      responses:
+        200:
+          description: Return values from commands in the command array.
+          examples:
+            kubectl:
+              kubectl:
+              - result:
+                  clientVersion:
+                    buildDate: '2022-05-24T12:26:19Z'
+                    compiler: gc
+                    gitCommit: 3ddd0f45aa91e2f30c70734b175631bec5b5825a
+                    gitTreeState: clean
+                    gitVersion: v1.24.1
+                    goVersion: go1.18.2
+                    major: '1'
+                    minor: '24'
+                    platform: linux/amd64
+                  kustomizeVersion: v4.5.4
+                success: true
+          schema:
+            type: object
+            properties:
+              kubectl:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - success
+                  - result
+                  properties:
+                    success:
+                      type: boolean
+                    result:
+                      additionalProperties: {}
+        default:
+          description: generic error response
+          headers:
+            Direktiv-ErrorCode:
+              type: string
+            Direktiv-ErrorMessage:
+              type: string
+          schema:
+            $ref: "#/definitions/error"
+definitions:
+  direktivFile:
+    type: object
+    x-go-type:
+      type: DirektivFile
+      import:
+        package: github.com/direktiv/apps/go/pkg/apps 
+  error:
+    type: object
+    required:
+      - errorCode
+      - errorMessage
+    properties:
+      errorCode:
+        type: string
+      errorMessage:
+        type: string
