@@ -37,7 +37,7 @@ func init() {
         "cloud",
         "tools"
       ],
-      "container": "direktiv/kubectl",
+      "container": "gcr.io/direktiv/apps/kubectl",
       "issues": "https://github.com/direktiv-apps/kubectl/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
       "long-description": "This function allows to run kubectl commands in Direktiv. It uses ` + "`" + `kubectl.yaml` + "`" + ` in the working directory for authentication.\nThis file can be provided in the payload as base64 string or in ` + "`" + `files` + "`" + ` as well as via Direktiv files for actions.",
@@ -217,7 +217,7 @@ func init() {
             "title": "Kubectl with Direktiv File"
           }
         ],
-        "x-direktiv-function": "functions:\n  - id: kubectl\n    image: direktiv/kubectl:1.0\n    type: knative-workflow"
+        "x-direktiv-function": "functions:\n  - id: kubectl\n    image: gcr.io/direktiv/apps/kubectl:1.0\n    type: knative-workflow"
       },
       "delete": {
         "parameters": [
@@ -286,7 +286,7 @@ func init() {
         "cloud",
         "tools"
       ],
-      "container": "direktiv/kubectl",
+      "container": "gcr.io/direktiv/apps/kubectl",
       "issues": "https://github.com/direktiv-apps/kubectl/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
       "long-description": "This function allows to run kubectl commands in Direktiv. It uses ` + "`" + `kubectl.yaml` + "`" + ` in the working directory for authentication.\nThis file can be provided in the payload as base64 string or in ` + "`" + `files` + "`" + ` as well as via Direktiv files for actions.",
@@ -433,7 +433,7 @@ func init() {
             "title": "Kubectl with Direktiv File"
           }
         ],
-        "x-direktiv-function": "functions:\n  - id: kubectl\n    image: direktiv/kubectl:1.0\n    type: knative-workflow"
+        "x-direktiv-function": "functions:\n  - id: kubectl\n    image: gcr.io/direktiv/apps/kubectl:1.0\n    type: knative-workflow"
       },
       "delete": {
         "parameters": [

@@ -5,7 +5,7 @@ Run kubectl commands in Direktiv.
 
 ---
 - #### Categories: cloud, tools
-- #### Image: direktiv/kubectl 
+- #### Image: gcr.io/direktiv/apps/kubectl 
 - #### License: [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
 - #### Issue Tracking: https://github.com/direktiv-apps/kubectl/issues
 - #### URL: https://github.com/direktiv-apps/kubectl
@@ -22,7 +22,7 @@ This file can be provided in the payload as base64 string or in `files` as well 
   ```yaml
   functions:
   - id: kubectl
-    image: direktiv/kubectl:1.0
+    image: gcr.io/direktiv/apps/kubectl:1.0
     type: knative-workflow
   ```
    #### Kubectl with Secrets
