@@ -23,12 +23,6 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 RUN unzip awscliv2.zip
 RUN ./aws/install
 
-# RUN apt-get update && apt-get install ca-certificates apt-transport-https curl -y
-# RUN curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-# RUN echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
-# RUN apt-get update && apt-get install -y kubectl kubeadm
-
-
 # DON'T CHANGE BELOW 
 COPY --from=build /application /bin/application
 
