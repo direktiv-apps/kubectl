@@ -14,10 +14,10 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
-	"kubectl/restapi/operations"
+	"app/restapi/operations"
 )
 
-//go:generate swagger generate server --target ../../app --name Kubectl --spec ../swagger.yaml --principal interface{}
+//go:generate swagger generate server --target ../../app --name Kubectl --spec ../../../swagger.yaml --template-dir /home/jensg/go/src/github.com/direktiv-apps/kubectl2/build/templates --principal interface{}
 
 func configureFlags(api *operations.KubectlAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }

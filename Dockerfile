@@ -1,33 +1,36 @@
 FROM golang:1.18.2-alpine as build
 
-COPY go.mod src/go.mod
-COPY go.sum src/go.sum
-RUN cd src/ && go mod download
+WORKDIR /src
 
-COPY cmd src/cmd/
-COPY models src/models/
-COPY restapi src/restapi/
+COPY build/app/go.mod go.mod
+COPY build/app/go.sum go.sum
 
-RUN cd src && \
-    export CGO_LDFLAGS="-static -w -s" && \
-    go build -tags osusergo,netgo -o /application cmd/kubectl-server/main.go; 
+RUN go mod download
 
-FROM ubuntu:21.04
+COPY build/app/cmd cmd/
+COPY build/app/models models/
+COPY build/app/restapi restapi/
 
-RUN apt-get update && apt-get install ca-certificates apt-transport-https curl unzip -y
-RUN curl -LO "https://dl.k8s.io/release/v1.23.6/bin/linux/amd64/kubectl"
-RUN install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+ENV CGO_LDFLAGS "-static -w -s"
 
-# AWS specific
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-RUN unzip awscliv2.zip
-RUN ./aws/install
+RUN go build -tags osusergo,netgo -o /application cmd/kubectl-server/main.go; 
+
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install ca-certificates curl git wget -y
+
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+RUN chmod 755 kubectl && mv kubectl /usr/local/bin
+
+RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+RUN chmod 700 get_helm.sh
+RUN ./get_helm.sh
+
+RUN helm version
 
 # DON'T CHANGE BELOW 
 COPY --from=build /application /bin/application
 
 EXPOSE 8080
-EXPOSE 9292
 
 CMD ["/bin/application", "--port=8080", "--host=0.0.0.0", "--write-timeout=0"]
-

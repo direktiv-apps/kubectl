@@ -29,19 +29,18 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Run kubectl commands in Direktiv.",
+    "description": "Kubectl and tools for Direktiv.",
     "title": "kubectl",
     "version": "1.0",
     "x-direktiv-meta": {
       "categories": [
-        "cloud",
-        "tools"
+        "build"
       ],
       "container": "gcr.io/direktiv/apps/kubectl",
       "issues": "https://github.com/direktiv-apps/kubectl/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
-      "long-description": "This function allows to run kubectl commands in Direktiv. It uses ` + "`" + `kubectl.yaml` + "`" + ` in the working directory for authentication.\nThis file can be provided in the payload as base64 string or in ` + "`" + `files` + "`" + ` as well as via Direktiv files for actions.",
-      "maintainer": "[direktiv.io](https://www.direktiv.io)",
+      "long-description": "This function provides kubectl, kustomize and helm. There following tools are installed:\n\n- kubectl 1.25\n- helm v3.9.3\n- curl\n- wget \n\nThe required kubeconfig has to be provided as base64 encoded file.",
+      "maintainer": "[direktiv.io](https://www.direktiv.io) ",
       "url": "https://github.com/direktiv-apps/kubectl"
     }
   },
@@ -51,12 +50,14 @@ func init() {
         "parameters": [
           {
             "type": "string",
+            "default": "development",
             "description": "direktiv action id is an UUID. \nFor development it can be set to 'development'\n",
             "name": "Direktiv-ActionID",
             "in": "header"
           },
           {
             "type": "string",
+            "default": "/tmp",
             "description": "direktiv temp dir is the working directory for that request\nFor development it can be set to e.g. '/tmp'\n",
             "name": "Direktiv-TempDir",
             "in": "header"
@@ -66,17 +67,24 @@ func init() {
             "in": "body",
             "schema": {
               "type": "object",
+              "required": [
+                "kubectl"
+              ],
               "properties": {
                 "commands": {
                   "description": "Array of commands.",
                   "type": "array",
+                  "default": [
+                    {
+                      "command": "echo Hello"
+                    }
+                  ],
                   "items": {
                     "type": "object",
                     "properties": {
                       "command": {
                         "description": "Command to run",
-                        "type": "string",
-                        "example": "kubectl version --client=true -o json"
+                        "type": "string"
                       },
                       "continue": {
                         "description": "Stops excecution if command fails, otherwise proceeds with next command",
@@ -96,16 +104,16 @@ func init() {
                   }
                 },
                 "files": {
-                  "description": "File to create before running commands. This can include a ` + "`" + `kubectl.yaml` + "`" + ` file from secrets.",
+                  "description": "File to create before running commands.",
                   "type": "array",
+                  "default": null,
                   "items": {
                     "$ref": "#/definitions/direktivFile"
                   }
                 },
-                "kubeconfig": {
-                  "description": "Base64 kubectl.yaml file. If not set ` + "`" + `kubectl.yaml` + "`" + ` will be used. This can be provided via Direktiv files.",
-                  "type": "string",
-                  "example": "tLS0tCk1IY0NBUUVFSUlQN...Fa0luUW1ZbGovY0lIbjQwakZ1eUUxe"
+                "kubectl": {
+                  "description": "kubeconfig as base64 encoded file",
+                  "type": "string"
                 }
               }
             }
@@ -113,7 +121,7 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "Return values from commands in the command array.",
+            "description": "List of executed commands.",
             "schema": {
               "type": "object",
               "properties": {
@@ -138,27 +146,24 @@ func init() {
               }
             },
             "examples": {
-              "kubectl": {
-                "kubectl": [
-                  {
-                    "result": {
-                      "clientVersion": {
-                        "buildDate": "2022-05-24T12:26:19Z",
-                        "compiler": "gc",
-                        "gitCommit": "3ddd0f45aa91e2f30c70734b175631bec5b5825a",
-                        "gitTreeState": "clean",
-                        "gitVersion": "v1.24.1",
-                        "goVersion": "go1.18.2",
-                        "major": "1",
-                        "minor": "24",
-                        "platform": "linux/amd64"
-                      },
-                      "kustomizeVersion": "v4.5.4"
-                    },
-                    "success": true
-                  }
-                ]
-              }
+              "kubectl": [
+                {
+                  "clientVersion": {
+                    "buildDate": "2022-08-23T17:44:59Z",
+                    "compiler": "gc",
+                    "gitCommit": "a866cbe2e5bbaa01cfd5e969aa3e033f3282a8a2",
+                    "gitTreeState": "clean",
+                    "gitVersion": "v1.25.0",
+                    "goVersion": "go1.19",
+                    "major": "1",
+                    "minor": "25",
+                    "platform": "linux/amd64"
+                  },
+                  "kustomizeVersion": "v4.5.7",
+                  "result": null
+                }
+              ],
+              "success": true
             }
           },
           "default": {
@@ -180,16 +185,13 @@ func init() {
           "cmds": [
             {
               "action": "exec",
-              "exec": "{{- if empty .Kubeconfig }}\necho \"no kubeconfig in payload\"\n{{- else }}\nbash -c \"echo {{ .Kubeconfig }} | base64 -d \u003e kubectl.yaml\"\n{{- end }}",
+              "exec": "bash -c 'mkdir -p ~/.kube/ \u0026\u0026 echo {{ .Kubectl }} | base64 -d \u003e ~/.kube/config'",
               "print": false,
               "silent": true
             },
             {
               "action": "foreach",
               "continue": "{{ .Item.Continue }}",
-              "env": [
-                "KUBECONFIG={{- .DirektivDir }}/kubectl.yaml"
-              ],
               "exec": "{{ .Item.Command }}",
               "loop": ".Commands",
               "print": "{{ .Item.Print }}",
@@ -205,19 +207,21 @@ func init() {
         },
         "x-direktiv-examples": [
           {
-            "content": "- id: kubectl \n      type: action\n      action:\n        secrets: [\"kubectl\"]\n        function: get\n        input: \n          kubeconfig: jq(.secrets.kubectl | @base64)\n          commands:\n          - command: kubectl --insecure-skip-tls-verify --server=https://myserver:6443/ -o json get pods",
-            "title": "Kubectl with Secrets"
+            "content": "- id: kubectl\n  type: action\n  action:\n    secrets: [\"kubeconfig\"]\n    function: kubectl\n    input: \n      kubeconfig: jq(.secrets.kubeconfig | @base64)\n      commands:\n      - command: kubectl version --client --output json",
+            "title": "Version"
           },
           {
-            "content": "- id: get-kubeconfig\n      type: getter\n      variables:\n      - key: k3s.yaml\n        scope: workflow\n      transition: kubectl\n    - id: kubectl \n      type: action\n      action:\n        secrets: [\"k3s\"]\n        function: get\n        input: \n          kubeconfig: jq(.var.\"k3s.yaml\")\n          commands:\n          - command: kubectl -o json get pods",
-            "title": "Kubectl with Variable"
-          },
-          {
-            "content": "- id: kubectl \n      type: action\n      action:\n        secrets: [\"k3s\"]\n        function: get\n        files:\n        - key: k3s.yaml\n          scope: workflow\n          as: kubectl.yaml\n        input: \n          kubeconfig: jq(.secrets.k3s | @base64)\n          commands:\n          - command: kubectl --server=https://myserver:6443/ -o json get pods",
-            "title": "Kubectl with Direktiv File"
+            "content": "- id: kubectl\n  type: action\n  action:\n    secrets: [\"kubeconfig\"]\n    function: kubectl\n    input: \n      kubeconfig: jq(.secrets.kubeconfig | @base64)\n      commands:\n      - command: kubectl get pods --output json\n  catch:\n  - error: \"*\"",
+            "title": "Pods"
           }
         ],
-        "x-direktiv-function": "functions:\n  - id: kubectl\n    image: gcr.io/direktiv/apps/kubectl:1.0\n    type: knative-workflow"
+        "x-direktiv-function": "functions:\n- id: kubectl\n  image: gcr.io/direktiv/apps/kubectl:1.0\n  type: knative-workflow",
+        "x-direktiv-secrets": [
+          {
+            "description": "Kubeconfig file as BASE64 encoded file for cluster access.",
+            "name": "kubeconfig"
+          }
+        ]
       },
       "delete": {
         "parameters": [
@@ -278,19 +282,18 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "Run kubectl commands in Direktiv.",
+    "description": "Kubectl and tools for Direktiv.",
     "title": "kubectl",
     "version": "1.0",
     "x-direktiv-meta": {
       "categories": [
-        "cloud",
-        "tools"
+        "build"
       ],
       "container": "gcr.io/direktiv/apps/kubectl",
       "issues": "https://github.com/direktiv-apps/kubectl/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
-      "long-description": "This function allows to run kubectl commands in Direktiv. It uses ` + "`" + `kubectl.yaml` + "`" + ` in the working directory for authentication.\nThis file can be provided in the payload as base64 string or in ` + "`" + `files` + "`" + ` as well as via Direktiv files for actions.",
-      "maintainer": "[direktiv.io](https://www.direktiv.io)",
+      "long-description": "This function provides kubectl, kustomize and helm. There following tools are installed:\n\n- kubectl 1.25\n- helm v3.9.3\n- curl\n- wget \n\nThe required kubeconfig has to be provided as base64 encoded file.",
+      "maintainer": "[direktiv.io](https://www.direktiv.io) ",
       "url": "https://github.com/direktiv-apps/kubectl"
     }
   },
@@ -300,12 +303,14 @@ func init() {
         "parameters": [
           {
             "type": "string",
+            "default": "development",
             "description": "direktiv action id is an UUID. \nFor development it can be set to 'development'\n",
             "name": "Direktiv-ActionID",
             "in": "header"
           },
           {
             "type": "string",
+            "default": "/tmp",
             "description": "direktiv temp dir is the working directory for that request\nFor development it can be set to e.g. '/tmp'\n",
             "name": "Direktiv-TempDir",
             "in": "header"
@@ -314,67 +319,35 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "type": "object",
-              "properties": {
-                "commands": {
-                  "description": "Array of commands.",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/CommandsItems0"
-                  }
-                },
-                "files": {
-                  "description": "File to create before running commands. This can include a ` + "`" + `kubectl.yaml` + "`" + ` file from secrets.",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/direktivFile"
-                  }
-                },
-                "kubeconfig": {
-                  "description": "Base64 kubectl.yaml file. If not set ` + "`" + `kubectl.yaml` + "`" + ` will be used. This can be provided via Direktiv files.",
-                  "type": "string",
-                  "example": "tLS0tCk1IY0NBUUVFSUlQN...Fa0luUW1ZbGovY0lIbjQwakZ1eUUxe"
-                }
-              }
+              "$ref": "#/definitions/postParamsBody"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Return values from commands in the command array.",
+            "description": "List of executed commands.",
             "schema": {
-              "type": "object",
-              "properties": {
-                "kubectl": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/KubectlItems0"
-                  }
-                }
-              }
+              "$ref": "#/definitions/postOKBody"
             },
             "examples": {
-              "kubectl": {
-                "kubectl": [
-                  {
-                    "result": {
-                      "clientVersion": {
-                        "buildDate": "2022-05-24T12:26:19Z",
-                        "compiler": "gc",
-                        "gitCommit": "3ddd0f45aa91e2f30c70734b175631bec5b5825a",
-                        "gitTreeState": "clean",
-                        "gitVersion": "v1.24.1",
-                        "goVersion": "go1.18.2",
-                        "major": "1",
-                        "minor": "24",
-                        "platform": "linux/amd64"
-                      },
-                      "kustomizeVersion": "v4.5.4"
-                    },
-                    "success": true
-                  }
-                ]
-              }
+              "kubectl": [
+                {
+                  "clientVersion": {
+                    "buildDate": "2022-08-23T17:44:59Z",
+                    "compiler": "gc",
+                    "gitCommit": "a866cbe2e5bbaa01cfd5e969aa3e033f3282a8a2",
+                    "gitTreeState": "clean",
+                    "gitVersion": "v1.25.0",
+                    "goVersion": "go1.19",
+                    "major": "1",
+                    "minor": "25",
+                    "platform": "linux/amd64"
+                  },
+                  "kustomizeVersion": "v4.5.7",
+                  "result": null
+                }
+              ],
+              "success": true
             }
           },
           "default": {
@@ -396,16 +369,13 @@ func init() {
           "cmds": [
             {
               "action": "exec",
-              "exec": "{{- if empty .Kubeconfig }}\necho \"no kubeconfig in payload\"\n{{- else }}\nbash -c \"echo {{ .Kubeconfig }} | base64 -d \u003e kubectl.yaml\"\n{{- end }}",
+              "exec": "bash -c 'mkdir -p ~/.kube/ \u0026\u0026 echo {{ .Kubectl }} | base64 -d \u003e ~/.kube/config'",
               "print": false,
               "silent": true
             },
             {
               "action": "foreach",
               "continue": "{{ .Item.Continue }}",
-              "env": [
-                "KUBECONFIG={{- .DirektivDir }}/kubectl.yaml"
-              ],
               "exec": "{{ .Item.Command }}",
               "loop": ".Commands",
               "print": "{{ .Item.Print }}",
@@ -421,19 +391,21 @@ func init() {
         },
         "x-direktiv-examples": [
           {
-            "content": "- id: kubectl \n      type: action\n      action:\n        secrets: [\"kubectl\"]\n        function: get\n        input: \n          kubeconfig: jq(.secrets.kubectl | @base64)\n          commands:\n          - command: kubectl --insecure-skip-tls-verify --server=https://myserver:6443/ -o json get pods",
-            "title": "Kubectl with Secrets"
+            "content": "- id: kubectl\n  type: action\n  action:\n    secrets: [\"kubeconfig\"]\n    function: kubectl\n    input: \n      kubeconfig: jq(.secrets.kubeconfig | @base64)\n      commands:\n      - command: kubectl version --client --output json",
+            "title": "Version"
           },
           {
-            "content": "- id: get-kubeconfig\n      type: getter\n      variables:\n      - key: k3s.yaml\n        scope: workflow\n      transition: kubectl\n    - id: kubectl \n      type: action\n      action:\n        secrets: [\"k3s\"]\n        function: get\n        input: \n          kubeconfig: jq(.var.\"k3s.yaml\")\n          commands:\n          - command: kubectl -o json get pods",
-            "title": "Kubectl with Variable"
-          },
-          {
-            "content": "- id: kubectl \n      type: action\n      action:\n        secrets: [\"k3s\"]\n        function: get\n        files:\n        - key: k3s.yaml\n          scope: workflow\n          as: kubectl.yaml\n        input: \n          kubeconfig: jq(.secrets.k3s | @base64)\n          commands:\n          - command: kubectl --server=https://myserver:6443/ -o json get pods",
-            "title": "Kubectl with Direktiv File"
+            "content": "- id: kubectl\n  type: action\n  action:\n    secrets: [\"kubeconfig\"]\n    function: kubectl\n    input: \n      kubeconfig: jq(.secrets.kubeconfig | @base64)\n      commands:\n      - command: kubectl get pods --output json\n  catch:\n  - error: \"*\"",
+            "title": "Pods"
           }
         ],
-        "x-direktiv-function": "functions:\n  - id: kubectl\n    image: gcr.io/direktiv/apps/kubectl:1.0\n    type: knative-workflow"
+        "x-direktiv-function": "functions:\n- id: kubectl\n  image: gcr.io/direktiv/apps/kubectl:1.0\n  type: knative-workflow",
+        "x-direktiv-secrets": [
+          {
+            "description": "Kubeconfig file as BASE64 encoded file for cluster access.",
+            "name": "kubeconfig"
+          }
+        ]
       },
       "delete": {
         "parameters": [
@@ -456,45 +428,6 @@ func init() {
     }
   },
   "definitions": {
-    "CommandsItems0": {
-      "type": "object",
-      "properties": {
-        "command": {
-          "description": "Command to run",
-          "type": "string",
-          "example": "kubectl version --client=true -o json"
-        },
-        "continue": {
-          "description": "Stops excecution if command fails, otherwise proceeds with next command",
-          "type": "boolean"
-        },
-        "print": {
-          "description": "If set to false the command will not print the full command with arguments to logs.",
-          "type": "boolean",
-          "default": true
-        },
-        "silent": {
-          "description": "If set to false the command will not print output to logs.",
-          "type": "boolean",
-          "default": false
-        }
-      }
-    },
-    "KubectlItems0": {
-      "type": "object",
-      "required": [
-        "success",
-        "result"
-      ],
-      "properties": {
-        "result": {
-          "additionalProperties": false
-        },
-        "success": {
-          "type": "boolean"
-        }
-      }
-    },
     "direktivFile": {
       "type": "object",
       "x-go-type": {
@@ -518,6 +451,91 @@ func init() {
           "type": "string"
         }
       }
+    },
+    "postOKBody": {
+      "type": "object",
+      "properties": {
+        "kubectl": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/postOKBodyKubectlItems"
+          }
+        }
+      },
+      "x-go-gen-location": "operations"
+    },
+    "postOKBodyKubectlItems": {
+      "type": "object",
+      "required": [
+        "success",
+        "result"
+      ],
+      "properties": {
+        "result": {
+          "additionalProperties": false
+        },
+        "success": {
+          "type": "boolean"
+        }
+      },
+      "x-go-gen-location": "operations"
+    },
+    "postParamsBody": {
+      "type": "object",
+      "required": [
+        "kubectl"
+      ],
+      "properties": {
+        "commands": {
+          "description": "Array of commands.",
+          "type": "array",
+          "default": [
+            {
+              "command": "echo Hello"
+            }
+          ],
+          "items": {
+            "$ref": "#/definitions/postParamsBodyCommandsItems"
+          }
+        },
+        "files": {
+          "description": "File to create before running commands.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/definitions/direktivFile"
+          }
+        },
+        "kubectl": {
+          "description": "kubeconfig as base64 encoded file",
+          "type": "string"
+        }
+      },
+      "x-go-gen-location": "operations"
+    },
+    "postParamsBodyCommandsItems": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "description": "Command to run",
+          "type": "string"
+        },
+        "continue": {
+          "description": "Stops excecution if command fails, otherwise proceeds with next command",
+          "type": "boolean"
+        },
+        "print": {
+          "description": "If set to false the command will not print the full command with arguments to logs.",
+          "type": "boolean",
+          "default": true
+        },
+        "silent": {
+          "description": "If set to false the command will not print output to logs.",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "x-go-gen-location": "operations"
     }
   }
 }`))

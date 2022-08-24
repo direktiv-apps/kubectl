@@ -2,7 +2,7 @@
 
 // Package restapi kubectl
 //
-//  Run kubectl commands in Direktiv.
+//  Kubectl and tools for Direktiv.
 //  Schemes:
 //    http
 //  Host: localhost

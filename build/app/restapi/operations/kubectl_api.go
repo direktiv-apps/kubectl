@@ -51,7 +51,7 @@ func NewKubectlAPI(spec *loads.Document) *KubectlAPI {
 	}
 }
 
-/*KubectlAPI Run kubectl commands in Direktiv. */
+/*KubectlAPI Kubectl and tools for Direktiv. */
 type KubectlAPI struct {
 	spec            *loads.Document
 	context         *middleware.Context

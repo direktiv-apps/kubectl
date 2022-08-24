@@ -10,7 +10,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 
-	"kubectl/models"
+	"app/models"
 )
 
 const (
@@ -38,7 +38,7 @@ type accParams struct {
 }
 
 type accParamsTemplate struct {
-	PostBody
+	models.PostParamsBody
 	Commands    []interface{}
 	DirektivDir string
 }
@@ -49,7 +49,7 @@ type ctxInfo struct {
 }
 
 func PostDirektivHandle(params PostParams) middleware.Responder {
-	resp := &PostOKBody{}
+	resp := &models.PostOKBody{}
 
 	var (
 		err  error
@@ -81,10 +81,15 @@ func PostDirektivHandle(params PostParams) middleware.Responder {
 	}
 
 	ret, err = runCommand0(ctx, accParams, ri)
+
 	responses = append(responses, ret)
 
 	// if foreach returns an error there is no continue
-	cont = convertTemplateToBool("<no value>", accParams, true)
+	//
+	// default we do not continue
+	cont = convertTemplateToBool("<no value>", accParams, false)
+	// cont = convertTemplateToBool("<no value>", accParams, true)
+	//
 
 	if err != nil && !cont {
 
@@ -107,10 +112,13 @@ func PostDirektivHandle(params PostParams) middleware.Responder {
 	accParams.Commands = paramsCollector
 
 	ret, err = runCommand1(ctx, accParams, ri)
+
 	responses = append(responses, ret)
 
 	// if foreach returns an error there is no continue
-	cont = false
+	//
+	// cont = false
+	//
 
 	if err != nil && !cont {
 
@@ -160,20 +168,15 @@ func runCommand0(ctx context.Context,
 	ir := make(map[string]interface{})
 	ir[successKey] = false
 
-	ri.Logger().Infof("executing command")
-
 	at := accParamsTemplate{
-		params.Body,
+		*params.Body,
 		params.Commands,
 		params.DirektivDir,
 	}
 
-	cmd, err := templateString(`{{- if empty .Kubeconfig }}
-echo "no kubeconfig in payload"
-{{- else }}
-bash -c "echo {{ .Kubeconfig }} | base64 -d > kubectl.yaml"
-{{- end }}`, at)
+	cmd, err := templateString(`bash -c 'mkdir -p ~/.kube/ && echo {{ .Kubectl }} | base64 -d > ~/.kube/config'`, at)
 	if err != nil {
+		ri.Logger().Infof("error executing command: %v", err)
 		ir[resultKey] = err.Error()
 		return ir, err
 	}
@@ -201,9 +204,11 @@ type LoopStruct1 struct {
 func runCommand1(ctx context.Context,
 	params accParams, ri *apps.RequestInfo) ([]map[string]interface{}, error) {
 
-	ri.Logger().Infof("foreach command over .Commands")
-
 	var cmds []map[string]interface{}
+
+	if params.Body == nil {
+		return cmds, nil
+	}
 
 	for a := range params.Body.Commands {
 
@@ -228,8 +233,6 @@ func runCommand1(ctx context.Context,
 		output := ""
 
 		envs := []string{}
-		env0, _ := templateString(`KUBECONFIG={{- .DirektivDir }}/kubectl.yaml`, ls)
-		envs = append(envs, env0)
 
 		r, err := runCmd(ctx, cmd, envs, output, silent, print, ri)
 		if err != nil {

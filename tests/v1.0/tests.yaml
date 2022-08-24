@@ -1,0 +1,25 @@
+url: ""
+functions:
+- type: knative-workflow
+  id: kubectl
+  image: gcr.io/direktiv/apps/kubectl:test
+states:
+- id: state0
+  type: action
+  action:
+    function: kubectl
+    input:
+      commands:
+      - command: Example of running kubectl
+  transition: state1
+- id: state1
+  type: action
+  action:
+    function: kubectl
+    input:
+      commands:
+      - command: Example of running kubectl
+      files:
+      - data: Hello World
+        mode: "0755"
+        name: hello.txt
