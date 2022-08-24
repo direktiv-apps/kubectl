@@ -29,7 +29,7 @@ type PostParamsBody struct {
 
 	// kubeconfig as base64 encoded file
 	// Required: true
-	Kubectl *string `json:"kubectl"`
+	Kubeconfig *string `json:"kubeconfig"`
 }
 
 // Validate validates this post params body
@@ -44,7 +44,7 @@ func (m *PostParamsBody) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateKubectl(formats); err != nil {
+	if err := m.validateKubeconfig(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -101,9 +101,9 @@ func (m *PostParamsBody) validateFiles(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *PostParamsBody) validateKubectl(formats strfmt.Registry) error {
+func (m *PostParamsBody) validateKubeconfig(formats strfmt.Registry) error {
 
-	if err := validate.Required("kubectl", "body", m.Kubectl); err != nil {
+	if err := validate.Required("kubeconfig", "body", m.Kubeconfig); err != nil {
 		return err
 	}
 

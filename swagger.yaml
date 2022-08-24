@@ -68,7 +68,7 @@ paths:
           in: body
           schema:
             type: object
-            required: ["kubectl"]
+            required: ["kubeconfig"]
             properties:
               files:
                 type: array
@@ -76,7 +76,7 @@ paths:
                   $ref: '#/definitions/direktivFile'
                 description: File to create before running commands.
                 default: []
-              kubectl:
+              kubeconfig:
                 type: string
                 description: kubeconfig as base64 encoded file
               commands:

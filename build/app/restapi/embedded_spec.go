@@ -68,7 +68,7 @@ func init() {
             "schema": {
               "type": "object",
               "required": [
-                "kubectl"
+                "kubeconfig"
               ],
               "properties": {
                 "commands": {
@@ -111,7 +111,7 @@ func init() {
                     "$ref": "#/definitions/direktivFile"
                   }
                 },
-                "kubectl": {
+                "kubeconfig": {
                   "description": "kubeconfig as base64 encoded file",
                   "type": "string"
                 }
@@ -483,7 +483,7 @@ func init() {
     "postParamsBody": {
       "type": "object",
       "required": [
-        "kubectl"
+        "kubeconfig"
       ],
       "properties": {
         "commands": {
@@ -506,7 +506,7 @@ func init() {
             "$ref": "#/definitions/direktivFile"
           }
         },
-        "kubectl": {
+        "kubeconfig": {
           "description": "kubeconfig as base64 encoded file",
           "type": "string"
         }
