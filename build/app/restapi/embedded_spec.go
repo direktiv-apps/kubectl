@@ -185,7 +185,7 @@ func init() {
           "cmds": [
             {
               "action": "exec",
-              "exec": "bash -c 'mkdir -p ~/.kube/ \u0026\u0026 echo {{ .Kubectl }} | base64 -d \u003e ~/.kube/config'",
+              "exec": "bash -c 'mkdir -p ~/.kube/ \u0026\u0026 echo {{ .Kubeconfig }} | base64 -d \u003e ~/.kube/config'",
               "print": false,
               "silent": true
             },
@@ -369,7 +369,7 @@ func init() {
           "cmds": [
             {
               "action": "exec",
-              "exec": "bash -c 'mkdir -p ~/.kube/ \u0026\u0026 echo {{ .Kubectl }} | base64 -d \u003e ~/.kube/config'",
+              "exec": "bash -c 'mkdir -p ~/.kube/ \u0026\u0026 echo {{ .Kubeconfig }} | base64 -d \u003e ~/.kube/config'",
               "print": false,
               "silent": true
             },

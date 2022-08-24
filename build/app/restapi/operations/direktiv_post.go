@@ -174,7 +174,7 @@ func runCommand0(ctx context.Context,
 		params.DirektivDir,
 	}
 
-	cmd, err := templateString(`bash -c 'mkdir -p ~/.kube/ && echo {{ .Kubectl }} | base64 -d > ~/.kube/config'`, at)
+	cmd, err := templateString(`bash -c 'mkdir -p ~/.kube/ && echo {{ .Kubeconfig }} | base64 -d > ~/.kube/config'`, at)
 	if err != nil {
 		ri.Logger().Infof("error executing command: %v", err)
 		ir[resultKey] = err.Error()
