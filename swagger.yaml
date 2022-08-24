@@ -4,7 +4,7 @@ info:
   title: kubectl
   version: "1.0"
   x-direktiv-meta:
-    container: gcr.io/direktiv/apps/kubectl
+    container: direktiv.azurecr.io/functions/kubectl
     maintainer: |-
       [direktiv.io](https://www.direktiv.io) 
     issues: https://github.com/direktiv-apps/kubectl/issues
@@ -24,7 +24,7 @@ info:
       - curl
 
       - wget 
-      
+
 
       The required kubeconfig has to be provided as base64 encoded file.
 
@@ -105,7 +105,7 @@ paths:
       x-direktiv-function: |-
         functions:
         - id: kubectl
-          image: gcr.io/direktiv/apps/kubectl:1.0
+          image: direktiv.azurecr.io/functions/kubectl:1.0
           type: knative-workflow
       x-direktiv-examples:
         - title: Version

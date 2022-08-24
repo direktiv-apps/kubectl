@@ -2,7 +2,7 @@ url: ""
 functions:
 - type: knative-workflow
   id: kubectl
-  image: gcr.io/direktiv/apps/kubectl:test
+  image: direktiv.azurecr.io/functions/kubectl:test
 states:
 - id: state0
   type: action
@@ -10,16 +10,20 @@ states:
     function: kubectl
     input:
       commands:
-      - command: Example of running kubectl
+      - command: kubectl version --client --output json
+      kubeconfig: jq(.secrets.kubeconfig | @base64)
+    secrets:
+    - kubeconfig
   transition: state1
 - id: state1
   type: action
+  catch:
+  - error: '*'
   action:
     function: kubectl
     input:
       commands:
-      - command: Example of running kubectl
-      files:
-      - data: Hello World
-        mode: "0755"
-        name: hello.txt
+      - command: kubectl get pods --output json
+      kubeconfig: jq(.secrets.kubeconfig | @base64)
+    secrets:
+    - kubeconfig

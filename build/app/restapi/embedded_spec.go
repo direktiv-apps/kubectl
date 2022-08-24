@@ -36,7 +36,7 @@ func init() {
       "categories": [
         "build"
       ],
-      "container": "gcr.io/direktiv/apps/kubectl",
+      "container": "direktiv.azurecr.io/functions/kubectl",
       "issues": "https://github.com/direktiv-apps/kubectl/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
       "long-description": "This function provides kubectl, kustomize and helm. There following tools are installed:\n\n- kubectl 1.25\n- helm v3.9.3\n- curl\n- wget \n\nThe required kubeconfig has to be provided as base64 encoded file.",
@@ -215,7 +215,7 @@ func init() {
             "title": "Pods"
           }
         ],
-        "x-direktiv-function": "functions:\n- id: kubectl\n  image: gcr.io/direktiv/apps/kubectl:1.0\n  type: knative-workflow",
+        "x-direktiv-function": "functions:\n- id: kubectl\n  image: direktiv.azurecr.io/functions/kubectl:1.0\n  type: knative-workflow",
         "x-direktiv-secrets": [
           {
             "description": "Kubeconfig file as BASE64 encoded file for cluster access.",
@@ -289,7 +289,7 @@ func init() {
       "categories": [
         "build"
       ],
-      "container": "gcr.io/direktiv/apps/kubectl",
+      "container": "direktiv.azurecr.io/functions/kubectl",
       "issues": "https://github.com/direktiv-apps/kubectl/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
       "long-description": "This function provides kubectl, kustomize and helm. There following tools are installed:\n\n- kubectl 1.25\n- helm v3.9.3\n- curl\n- wget \n\nThe required kubeconfig has to be provided as base64 encoded file.",
@@ -399,7 +399,7 @@ func init() {
             "title": "Pods"
           }
         ],
-        "x-direktiv-function": "functions:\n- id: kubectl\n  image: gcr.io/direktiv/apps/kubectl:1.0\n  type: knative-workflow",
+        "x-direktiv-function": "functions:\n- id: kubectl\n  image: direktiv.azurecr.io/functions/kubectl:1.0\n  type: knative-workflow",
         "x-direktiv-secrets": [
           {
             "description": "Kubeconfig file as BASE64 encoded file for cluster access.",

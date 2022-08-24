@@ -5,7 +5,7 @@ Kubectl and tools for Direktiv.
 
 ---
 - #### Categories: build
-- #### Image: gcr.io/direktiv/apps/kubectl 
+- #### Image: direktiv.azurecr.io/functions/kubectl 
 - #### License: [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
 - #### Issue Tracking: https://github.com/direktiv-apps/kubectl/issues
 - #### URL: https://github.com/direktiv-apps/kubectl
@@ -28,7 +28,7 @@ The required kubeconfig has to be provided as base64 encoded file.
 ```yaml
 functions:
 - id: kubectl
-  image: gcr.io/direktiv/apps/kubectl:1.0
+  image: direktiv.azurecr.io/functions/kubectl:1.0
   type: knative-workflow
 ```
    #### Version
