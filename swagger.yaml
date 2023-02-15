@@ -4,7 +4,7 @@ info:
   title: kubectl
   version: "1.0"
   x-direktiv-meta:
-    container: direktiv.azurecr.io/functions/kubectl
+    container: gcr.io/direktiv/functions/kubectl
     maintainer: |-
       [direktiv.io](https://www.direktiv.io) 
     issues: https://github.com/direktiv-apps/kubectl/issues
@@ -105,7 +105,7 @@ paths:
       x-direktiv-function: |-
         functions:
         - id: kubectl
-          image: direktiv.azurecr.io/functions/kubectl:1.0
+          image: gcr.io/direktiv/functions/kubectl:1.0
           type: knative-workflow
       x-direktiv-examples:
         - title: Version
