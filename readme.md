@@ -4,7 +4,7 @@
 ubectl and tools for Direktiv.
 
 ---
-- #### Categories: unknown
+- #### Categories: build
 - #### Image: gcr.io/direktiv/functions/kubetcl 
 - #### License: [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
 - #### Issue Tracking: https://github.com/direktiv-apps/kubetcl/issues
