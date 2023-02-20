@@ -1,7 +1,7 @@
 
 # kubetcl 1.0
 
-ubectl and tools for Direktiv.
+Kubectl and tools for Direktiv.
 
 ---
 - #### Categories: build

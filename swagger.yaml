@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  description: ubectl and tools for Direktiv.
+  description: Kubectl and tools for Direktiv.
   title: kubetcl
   version: "1.0"
   x-direktiv-meta:
