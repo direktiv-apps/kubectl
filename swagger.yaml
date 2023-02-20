@@ -1,14 +1,14 @@
 swagger: "2.0"
 info:
   description: Kubectl and tools for Direktiv.
-  title: kubetcl
+  title: kubectl
   version: "1.0"
   x-direktiv-meta:
-    container: gcr.io/direktiv/functions/kubetcl
+    container: gcr.io/direktiv/functions/kubectl
     maintainer: |-
       [direktiv.io](https://www.direktiv.io) 
-    issues: https://github.com/direktiv-apps/kubetcl/issues
-    url: https://github.com/direktiv-apps/kubetcl  
+    issues: https://github.com/direktiv-apps/kubectl/issues
+    url: https://github.com/direktiv-apps/kubectl  
     categories:
     - build
     license: |-
@@ -104,8 +104,8 @@ paths:
       # direktiv code generation is configured here
       x-direktiv-function: |-
         functions:
-        - id: kubetcl
-          image: gcr.io/direktiv/functions/kubetcl:1.0
+        - id: kubectl
+          image: gcr.io/direktiv/functions/kubectl:1.0
           type: knative-workflow
       x-direktiv-examples:
         # ADD MORE EXAMPLES HERE
@@ -174,9 +174,6 @@ paths:
                 platform: linux/amd64
               kustomizeVersion: v4.5.7
             success: true
-          # schema:
-          #   type: object
-          #   additionalProperties: {}
           schema:
             type: object
             properties:

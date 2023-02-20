@@ -17,9 +17,9 @@ import (
 	"app/restapi/operations"
 )
 
-//go:generate swagger generate server --target ../../app --name Kubetcl --spec ../../../swagger.yaml --template-dir /home/jensg/go/src/github.com/direktiv-apps/kubectl/build/templates --principal interface{}
+//go:generate swagger generate server --target ../../app --name Kubectl --spec ../../../swagger.yaml --template-dir /home/jensg/go/src/github.com/direktiv-apps/kubectl/build/templates --principal interface{}
 
-func configureFlags(api *operations.KubetclAPI) {
+func configureFlags(api *operations.KubectlAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
 }
 
@@ -113,7 +113,7 @@ func serveError(rw http.ResponseWriter, r *http.Request, err error) {
 
 }
 
-func configureAPI(api *operations.KubetclAPI) http.Handler {
+func configureAPI(api *operations.KubectlAPI) http.Handler {
 	// configure the api here
 	api.ServeError = serveError
 

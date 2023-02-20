@@ -29,19 +29,19 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "ubectl and tools for Direktiv.",
-    "title": "kubetcl",
+    "description": "Kubectl and tools for Direktiv.",
+    "title": "kubectl",
     "version": "1.0",
     "x-direktiv-meta": {
       "categories": [
-        "unknown"
+        "build"
       ],
-      "container": "gcr.io/direktiv/functions/kubetcl",
-      "issues": "https://github.com/direktiv-apps/kubetcl/issues",
+      "container": "gcr.io/direktiv/functions/kubectl",
+      "issues": "https://github.com/direktiv-apps/kubectl/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
       "long-description": "This function provides kubectl, kustomize and helm. There following tools are installed:\n\n- kubectl v1.26.1\n- helm v3.11.1\n- curl\n- wget \n- git\n\nThe required kubeconfig has to be provided as base64 encoded file.",
       "maintainer": "[direktiv.io](https://www.direktiv.io) ",
-      "url": "https://github.com/direktiv-apps/kubetcl"
+      "url": "https://github.com/direktiv-apps/kubectl"
     }
   },
   "paths": {
@@ -212,7 +212,7 @@ func init() {
             "title": "Advanced"
           }
         ],
-        "x-direktiv-function": "functions:\n- id: kubetcl\n  image: gcr.io/direktiv/functions/kubetcl:1.0\n  type: knative-workflow",
+        "x-direktiv-function": "functions:\n- id: kubectl\n  image: gcr.io/direktiv/functions/kubectl:1.0\n  type: knative-workflow",
         "x-direktiv-secrets": [
           {
             "description": "Kubeconfig file as BASE64 encoded file for cluster access.",
@@ -279,19 +279,19 @@ func init() {
   ],
   "swagger": "2.0",
   "info": {
-    "description": "ubectl and tools for Direktiv.",
-    "title": "kubetcl",
+    "description": "Kubectl and tools for Direktiv.",
+    "title": "kubectl",
     "version": "1.0",
     "x-direktiv-meta": {
       "categories": [
-        "unknown"
+        "build"
       ],
-      "container": "gcr.io/direktiv/functions/kubetcl",
-      "issues": "https://github.com/direktiv-apps/kubetcl/issues",
+      "container": "gcr.io/direktiv/functions/kubectl",
+      "issues": "https://github.com/direktiv-apps/kubectl/issues",
       "license": "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)",
       "long-description": "This function provides kubectl, kustomize and helm. There following tools are installed:\n\n- kubectl v1.26.1\n- helm v3.11.1\n- curl\n- wget \n- git\n\nThe required kubeconfig has to be provided as base64 encoded file.",
       "maintainer": "[direktiv.io](https://www.direktiv.io) ",
-      "url": "https://github.com/direktiv-apps/kubetcl"
+      "url": "https://github.com/direktiv-apps/kubectl"
     }
   },
   "paths": {
@@ -396,7 +396,7 @@ func init() {
             "title": "Advanced"
           }
         ],
-        "x-direktiv-function": "functions:\n- id: kubetcl\n  image: gcr.io/direktiv/functions/kubetcl:1.0\n  type: knative-workflow",
+        "x-direktiv-function": "functions:\n- id: kubectl\n  image: gcr.io/direktiv/functions/kubectl:1.0\n  type: knative-workflow",
         "x-direktiv-secrets": [
           {
             "description": "Kubeconfig file as BASE64 encoded file for cluster access.",

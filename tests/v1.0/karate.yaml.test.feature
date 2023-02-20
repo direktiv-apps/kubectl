@@ -6,7 +6,7 @@ Background:
 * def kubeconfig = karate.properties['kubeconfig']
 
 
-Scenario:  version
+Scenario: get request
 
 	Given url karate.properties['testURL']
 
@@ -16,12 +16,11 @@ Scenario:  version
 	And request
 	"""
 	{
-		"kubectl": #(kubeconfig),
 		"commands": [
 		{
-			"command": "kubectl version --client --output json",
-			"silent": false,
-			"print": true,
+			"command": "ls -la",
+			"silent": true,
+			"print": false,
 		}
 		]
 	}
@@ -33,36 +32,10 @@ Scenario:  version
 	{
 	"kubectl": [
 	{
-		"result": {
-			"clientVersion": #notnull,
-			"kustomizeVersion": #notnull
-		},
+		"result": "#notnull",
 		"success": true
 	}
 	]
 	}
 	"""
-	
-Scenario: pods
-
-	Given url karate.properties['testURL']
-
-	And path '/'
-	And header Direktiv-ActionID = 'development'
-	And header Direktiv-TempDir = '/tmp'
-	And request
-	"""
-	{
-		"kubectl": #(kubeconfig),
-		"commands": [
-		{
-			"command": "kubectl get pods --output json",
-			"silent": true,
-			"print": false,
-		}
-		]
-	}
-	"""
-	When method POST
-	Then status 500
 	

@@ -20,9 +20,9 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// NewKubetclAPI creates a new Kubetcl instance
-func NewKubetclAPI(spec *loads.Document) *KubetclAPI {
-	return &KubetclAPI{
+// NewKubectlAPI creates a new Kubectl instance
+func NewKubectlAPI(spec *loads.Document) *KubectlAPI {
+	return &KubectlAPI{
 		handlers:            make(map[string]map[string]http.Handler),
 		formats:             strfmt.Default,
 		defaultConsumes:     "application/json",
@@ -51,8 +51,8 @@ func NewKubetclAPI(spec *loads.Document) *KubetclAPI {
 	}
 }
 
-/*KubetclAPI ubectl and tools for Direktiv. */
-type KubetclAPI struct {
+/*KubectlAPI Kubectl and tools for Direktiv. */
+type KubectlAPI struct {
 	spec            *loads.Document
 	context         *middleware.Context
 	handlers        map[string]map[string]http.Handler
@@ -109,52 +109,52 @@ type KubetclAPI struct {
 }
 
 // UseRedoc for documentation at /docs
-func (o *KubetclAPI) UseRedoc() {
+func (o *KubectlAPI) UseRedoc() {
 	o.useSwaggerUI = false
 }
 
 // UseSwaggerUI for documentation at /docs
-func (o *KubetclAPI) UseSwaggerUI() {
+func (o *KubectlAPI) UseSwaggerUI() {
 	o.useSwaggerUI = true
 }
 
 // SetDefaultProduces sets the default produces media type
-func (o *KubetclAPI) SetDefaultProduces(mediaType string) {
+func (o *KubectlAPI) SetDefaultProduces(mediaType string) {
 	o.defaultProduces = mediaType
 }
 
 // SetDefaultConsumes returns the default consumes media type
-func (o *KubetclAPI) SetDefaultConsumes(mediaType string) {
+func (o *KubectlAPI) SetDefaultConsumes(mediaType string) {
 	o.defaultConsumes = mediaType
 }
 
 // SetSpec sets a spec that will be served for the clients.
-func (o *KubetclAPI) SetSpec(spec *loads.Document) {
+func (o *KubectlAPI) SetSpec(spec *loads.Document) {
 	o.spec = spec
 }
 
 // DefaultProduces returns the default produces media type
-func (o *KubetclAPI) DefaultProduces() string {
+func (o *KubectlAPI) DefaultProduces() string {
 	return o.defaultProduces
 }
 
 // DefaultConsumes returns the default consumes media type
-func (o *KubetclAPI) DefaultConsumes() string {
+func (o *KubectlAPI) DefaultConsumes() string {
 	return o.defaultConsumes
 }
 
 // Formats returns the registered string formats
-func (o *KubetclAPI) Formats() strfmt.Registry {
+func (o *KubectlAPI) Formats() strfmt.Registry {
 	return o.formats
 }
 
 // RegisterFormat registers a custom format validator
-func (o *KubetclAPI) RegisterFormat(name string, format strfmt.Format, validator strfmt.Validator) {
+func (o *KubectlAPI) RegisterFormat(name string, format strfmt.Format, validator strfmt.Validator) {
 	o.formats.Add(name, format, validator)
 }
 
-// Validate validates the registrations in the KubetclAPI
-func (o *KubetclAPI) Validate() error {
+// Validate validates the registrations in the KubectlAPI
+func (o *KubectlAPI) Validate() error {
 	var unregistered []string
 
 	if o.JSONConsumer == nil {
@@ -180,23 +180,23 @@ func (o *KubetclAPI) Validate() error {
 }
 
 // ServeErrorFor gets a error handler for a given operation id
-func (o *KubetclAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *http.Request, error) {
+func (o *KubectlAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *http.Request, error) {
 	return o.ServeError
 }
 
 // AuthenticatorsFor gets the authenticators for the specified security schemes
-func (o *KubetclAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
+func (o *KubectlAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
 	return nil
 }
 
 // Authorizer returns the registered authorizer
-func (o *KubetclAPI) Authorizer() runtime.Authorizer {
+func (o *KubectlAPI) Authorizer() runtime.Authorizer {
 	return nil
 }
 
 // ConsumersFor gets the consumers for the specified media types.
 // MIME type parameters are ignored here.
-func (o *KubetclAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer {
+func (o *KubectlAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer {
 	result := make(map[string]runtime.Consumer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
@@ -213,7 +213,7 @@ func (o *KubetclAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consum
 
 // ProducersFor gets the producers for the specified media types.
 // MIME type parameters are ignored here.
-func (o *KubetclAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer {
+func (o *KubectlAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer {
 	result := make(map[string]runtime.Producer, len(mediaTypes))
 	for _, mt := range mediaTypes {
 		switch mt {
@@ -229,7 +229,7 @@ func (o *KubetclAPI) ProducersFor(mediaTypes []string) map[string]runtime.Produc
 }
 
 // HandlerFor gets a http.Handler for the provided operation method and path
-func (o *KubetclAPI) HandlerFor(method, path string) (http.Handler, bool) {
+func (o *KubectlAPI) HandlerFor(method, path string) (http.Handler, bool) {
 	if o.handlers == nil {
 		return nil, false
 	}
@@ -244,8 +244,8 @@ func (o *KubetclAPI) HandlerFor(method, path string) (http.Handler, bool) {
 	return h, ok
 }
 
-// Context returns the middleware context for the kubetcl API
-func (o *KubetclAPI) Context() *middleware.Context {
+// Context returns the middleware context for the kubectl API
+func (o *KubectlAPI) Context() *middleware.Context {
 	if o.context == nil {
 		o.context = middleware.NewRoutableContext(o.spec, o, nil)
 	}
@@ -253,7 +253,7 @@ func (o *KubetclAPI) Context() *middleware.Context {
 	return o.context
 }
 
-func (o *KubetclAPI) initHandlerCache() {
+func (o *KubectlAPI) initHandlerCache() {
 	o.Context() // don't care about the result, just that the initialization happened
 	if o.handlers == nil {
 		o.handlers = make(map[string]map[string]http.Handler)
@@ -271,7 +271,7 @@ func (o *KubetclAPI) initHandlerCache() {
 
 // Serve creates a http handler to serve the API over HTTP
 // can be used directly in http.ListenAndServe(":8000", api.Serve(nil))
-func (o *KubetclAPI) Serve(builder middleware.Builder) http.Handler {
+func (o *KubectlAPI) Serve(builder middleware.Builder) http.Handler {
 	o.Init()
 
 	if o.Middleware != nil {
@@ -284,24 +284,24 @@ func (o *KubetclAPI) Serve(builder middleware.Builder) http.Handler {
 }
 
 // Init allows you to just initialize the handler cache, you can then recompose the middleware as you see fit
-func (o *KubetclAPI) Init() {
+func (o *KubectlAPI) Init() {
 	if len(o.handlers) == 0 {
 		o.initHandlerCache()
 	}
 }
 
 // RegisterConsumer allows you to add (or override) a consumer for a media type.
-func (o *KubetclAPI) RegisterConsumer(mediaType string, consumer runtime.Consumer) {
+func (o *KubectlAPI) RegisterConsumer(mediaType string, consumer runtime.Consumer) {
 	o.customConsumers[mediaType] = consumer
 }
 
 // RegisterProducer allows you to add (or override) a producer for a media type.
-func (o *KubetclAPI) RegisterProducer(mediaType string, producer runtime.Producer) {
+func (o *KubectlAPI) RegisterProducer(mediaType string, producer runtime.Producer) {
 	o.customProducers[mediaType] = producer
 }
 
 // AddMiddlewareFor adds a http middleware to existing handler
-func (o *KubetclAPI) AddMiddlewareFor(method, path string, builder middleware.Builder) {
+func (o *KubectlAPI) AddMiddlewareFor(method, path string, builder middleware.Builder) {
 	um := strings.ToUpper(method)
 	if path == "/" {
 		path = ""

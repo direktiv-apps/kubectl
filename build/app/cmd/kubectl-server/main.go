@@ -23,13 +23,13 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	api := operations.NewKubetclAPI(swaggerSpec)
+	api := operations.NewKubectlAPI(swaggerSpec)
 	server := restapi.NewServer(api)
 	defer server.Shutdown()
 
 	parser := flags.NewParser(server, flags.Default)
-	parser.ShortDescription = "kubetcl"
-	parser.LongDescription = "ubectl and tools for Direktiv."
+	parser.ShortDescription = "kubectl"
+	parser.LongDescription = "Kubectl and tools for Direktiv."
 	server.ConfigureFlags()
 	for _, optsGroup := range api.CommandLineOptionsGroups {
 		_, err := parser.AddGroup(optsGroup.ShortDescription, optsGroup.LongDescription, optsGroup.Options)
