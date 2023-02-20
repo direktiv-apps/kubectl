@@ -16,7 +16,8 @@ import (
 // PostOKCode is the HTTP code returned for type PostOK
 const PostOKCode int = 200
 
-/*PostOK List of executed commands.
+/*
+PostOK List of executed commands.
 
 swagger:response postOK
 */
@@ -57,7 +58,8 @@ func (o *PostOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer
 	}
 }
 
-/*PostDefault generic error response
+/*
+PostDefault generic error response
 
 swagger:response postDefault
 */

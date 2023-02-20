@@ -1,25 +1,26 @@
 
-# kubectl 1.0
+# kubetcl 1.0
 
-Kubectl and tools for Direktiv.
+ubectl and tools for Direktiv.
 
 ---
-- #### Categories: build
-- #### Image: direktiv.azurecr.io/functions/kubectl 
+- #### Categories: unknown
+- #### Image: gcr.io/direktiv/functions/kubetcl 
 - #### License: [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
-- #### Issue Tracking: https://github.com/direktiv-apps/kubectl/issues
-- #### URL: https://github.com/direktiv-apps/kubectl
+- #### Issue Tracking: https://github.com/direktiv-apps/kubetcl/issues
+- #### URL: https://github.com/direktiv-apps/kubetcl
 - #### Maintainer: [direktiv.io](https://www.direktiv.io) 
 ---
 
-## About kubectl
+## About kubetcl
 
 This function provides kubectl, kustomize and helm. There following tools are installed:
 
-- kubectl 1.25
-- helm v3.9.3
+- kubectl v1.26.1
+- helm v3.11.1
 - curl
 - wget 
+- git
 
 The required kubeconfig has to be provided as base64 encoded file.
 
@@ -27,11 +28,11 @@ The required kubeconfig has to be provided as base64 encoded file.
   #### Function Configuration
 ```yaml
 functions:
-- id: kubectl
-  image: direktiv.azurecr.io/functions/kubectl:1.0
+- id: kubetcl
+  image: gcr.io/direktiv/functions/kubetcl:1.0
   type: knative-workflow
 ```
-   #### Version
+   #### Basic
 ```yaml
 - id: kubectl
   type: action
@@ -43,7 +44,7 @@ functions:
       commands:
       - command: kubectl version --client --output json
 ```
-   #### Pods
+   #### Advanced
 ```yaml
 - id: kubectl
   type: action
@@ -153,9 +154,9 @@ true
 
 | Name | Type | Go type | Required | Default | Description | Example |
 |------|------|---------|:--------:| ------- |-------------|---------|
-| commands | [][PostParamsBodyCommandsItems](#post-params-body-commands-items)| `[]*PostParamsBodyCommandsItems` |  | `[{"command":"echo Hello"}]`| Array of commands. |  |
+| commands | [][PostParamsBodyCommandsItems](#post-params-body-commands-items)| `[]*PostParamsBodyCommandsItems` |  | `[{"command":"kubectl version"}]`| Array of commands. |  |
 | files | [][DirektivFile](#direktiv-file)| `[]apps.DirektivFile` |  | | File to create before running commands. |  |
-| kubectl | string| `string` | ✓ | | kubeconfig as base64 encoded file |  |
+| kubeconfig | string| `string` |  | | kubeconfig as base64 encoded file |  |
 
 
 #### <span id="post-params-body-commands-items"></span> postParamsBodyCommandsItems

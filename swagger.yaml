@@ -1,33 +1,34 @@
 swagger: "2.0"
 info:
-  description: Kubectl and tools for Direktiv.
-  title: kubectl
+  description: ubectl and tools for Direktiv.
+  title: kubetcl
   version: "1.0"
   x-direktiv-meta:
-    container: gcr.io/direktiv/functions/kubectl
+    container: gcr.io/direktiv/functions/kubetcl
     maintainer: |-
       [direktiv.io](https://www.direktiv.io) 
-    issues: https://github.com/direktiv-apps/kubectl/issues
-    url: https://github.com/direktiv-apps/kubectl  
+    issues: https://github.com/direktiv-apps/kubetcl/issues
+    url: https://github.com/direktiv-apps/kubetcl  
     categories:
-    - build
+    - unknown
     license: |-
       [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
     long-description: >-
       This function provides kubectl, kustomize and helm. There following tools are installed:
 
 
-      - kubectl 1.25
+      - kubectl v1.26.1
 
-      - helm v3.9.3
+      - helm v3.11.1
 
       - curl
 
       - wget 
 
+      - git
+
 
       The required kubeconfig has to be provided as base64 encoded file.
-
 consumes:
 - application/json
 produces:
@@ -68,7 +69,6 @@ paths:
           in: body
           schema:
             type: object
-            required: ["kubeconfig"]
             properties:
               files:
                 type: array
@@ -100,15 +100,16 @@ paths:
                       type: boolean
                       description: Stops excecution if command fails, otherwise proceeds with next command 
                 default: 
-                - command: echo Hello
+                - command: kubectl version
       # direktiv code generation is configured here
       x-direktiv-function: |-
         functions:
-        - id: kubectl
-          image: gcr.io/direktiv/functions/kubectl:1.0
+        - id: kubetcl
+          image: gcr.io/direktiv/functions/kubetcl:1.0
           type: knative-workflow
       x-direktiv-examples:
-        - title: Version
+        # ADD MORE EXAMPLES HERE
+        - title: Basic
           content: |-
             - id: kubectl
               type: action
@@ -119,7 +120,7 @@ paths:
                   kubeconfig: jq(.secrets.kubeconfig | @base64)
                   commands:
                   - command: kubectl version --client --output json
-        - title: Pods
+        - title: Advanced
           content: |-
             - id: kubectl
               type: action
@@ -173,6 +174,9 @@ paths:
                 platform: linux/amd64
               kustomizeVersion: v4.5.7
             success: true
+          # schema:
+          #   type: object
+          #   additionalProperties: {}
           schema:
             type: object
             properties:

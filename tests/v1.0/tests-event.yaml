@@ -9,7 +9,7 @@ start:
   event:
     type: io.direktiv.function.test
     context:
-      function: 'kubectl'
+      function: 'kubetcl'
       version: '1.0'
 states:
 - id: call-subflow

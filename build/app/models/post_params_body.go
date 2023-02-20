@@ -13,7 +13,6 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // PostParamsBody post params body
@@ -28,8 +27,7 @@ type PostParamsBody struct {
 	Files []apps.DirektivFile `json:"files"`
 
 	// kubeconfig as base64 encoded file
-	// Required: true
-	Kubeconfig *string `json:"kubeconfig"`
+	Kubeconfig string `json:"kubeconfig,omitempty"`
 }
 
 // Validate validates this post params body
@@ -41,10 +39,6 @@ func (m *PostParamsBody) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateFiles(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateKubeconfig(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -96,15 +90,6 @@ func (m *PostParamsBody) validateFiles(formats strfmt.Registry) error {
 			return err
 		}
 
-	}
-
-	return nil
-}
-
-func (m *PostParamsBody) validateKubeconfig(formats strfmt.Registry) error {
-
-	if err := validate.Required("kubeconfig", "body", m.Kubeconfig); err != nil {
-		return err
 	}
 
 	return nil

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-docker build -t kubectl . && docker run -p 9191:8080 kubectl
+docker build -t kubetcl . && docker run -p 9191:8080 kubetcl

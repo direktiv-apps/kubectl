@@ -20,8 +20,8 @@ Scenario:  version
 		"commands": [
 		{
 			"command": "kubectl version --client --output json",
-			"silent": true,
-			"print": false,
+			"silent": false,
+			"print": true,
 		}
 		]
 	}

@@ -1,8 +1,8 @@
 url: ""
 functions:
 - type: knative-workflow
-  id: kubectl
-  image: direktiv.azurecr.io/functions/kubectl:test
+  id: kubetcl
+  image: gcr.io/direktiv/functions/kubetcl:test
 states:
 - id: state0
   type: action

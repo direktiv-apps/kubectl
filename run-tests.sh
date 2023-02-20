@@ -10,6 +10,4 @@ if [[ -z "${DIREKTIV_SECRET_kubeconfig}" ]]; then
 	exit 1
 fi
 
-b64=`cat ${DIREKTIV_SECRET_kubeconfig} | base64 -w 0`
-
-docker run --network=host -v `pwd`/tests/:/tests direktiv/karate java -DtestURL=${DIREKTIV_TEST_URL} -Dlogback.configurationFile=/logging.xml -Dkubeconfig="${b64}"  -jar /karate.jar /tests/v1.0/karate.yaml.test.feature ${*:1}
+docker run --network=host -v `pwd`/tests/:/tests direktiv/karate java -DtestURL=${DIREKTIV_TEST_URL} -Dlogback.configurationFile=/logging.xml -Dkubeconfig="${DIREKTIV_SECRET_kubeconfig}"  -jar /karate.jar /tests/v1.0/karate.yaml.test.feature ${*:1}
