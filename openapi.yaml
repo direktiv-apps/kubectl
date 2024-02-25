@@ -1,0 +1,183 @@
+openapi: 3.0.1
+info:
+  title: kubectl
+  description: Kubectl and tools for Direktiv.
+  version: "1.0"
+  x-direktiv-meta:
+    container: gcr.io/direktiv/functions/kubectl
+    maintainer: "[direktiv.io](https://www.direktiv.io) "
+    issues: https://github.com/direktiv-apps/kubectl/issues
+    url: https://github.com/direktiv-apps/kubectl
+    categories:
+    - build
+    license: "[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)"
+    long-description: "This function provides kubectl, kustomize and helm. There following\
+      \ tools are installed:\n\n- kubectl v1.26.1\n- helm v3.11.1\n- curl\n- wget\
+      \ \n- git\n\nThe required kubeconfig has to be provided as base64 encoded file."
+servers:
+- url: /
+paths:
+  /:
+    post:
+      parameters:
+      - name: Direktiv-ActionID
+        in: header
+        description: "direktiv action id is an UUID. \nFor development it can be set\
+          \ to 'development'\n"
+        schema:
+          type: string
+          default: development
+      - name: Direktiv-TempDir
+        in: header
+        description: |
+          direktiv temp dir is the working directory for that request
+          For development it can be set to e.g. '/tmp'
+        schema:
+          type: string
+          default: /tmp
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  description: File to create before running commands.
+                  items:
+                    $ref: '#/components/schemas/direktivFile'
+                kubeconfig:
+                  type: string
+                  description: kubeconfig as base64 encoded file
+                commands:
+                  type: array
+                  description: Array of commands.
+                  items:
+                    type: object
+                    properties:
+                      command:
+                        type: string
+                        description: Command to run
+                      silent:
+                        type: boolean
+                        description: If set to false the command will not print output
+                          to logs.
+                        default: false
+                      print:
+                        type: boolean
+                        description: If set to false the command will not print the
+                          full command with arguments to logs.
+                        default: true
+                      continue:
+                        type: boolean
+                        description: "Stops excecution if command fails, otherwise\
+                          \ proceeds with next command"
+        required: false
+      responses:
+        "200":
+          description: List of executed commands.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kubectl:
+                    type: array
+                    items:
+                      required:
+                      - result
+                      - success
+                      type: object
+                      properties:
+                        success:
+                          type: boolean
+                        result:
+                          type: object
+            kubectl:
+              example:
+              - result: null
+                clientVersion:
+                  buildDate: 2022-08-23T17:44:59Z
+                  compiler: gc
+                  gitCommit: a866cbe2e5bbaa01cfd5e969aa3e033f3282a8a2
+                  gitTreeState: clean
+                  gitVersion: v1.25.0
+                  goVersion: go1.19
+                  major: "1"
+                  minor: "25"
+                  platform: linux/amd64
+                kustomizeVersion: v4.5.7
+            success:
+              example: true
+        default:
+          description: generic error response
+          headers:
+            Direktiv-ErrorMessage:
+              schema:
+                type: string
+            Direktiv-ErrorCode:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      x-direktiv-function: |-
+        functions:
+        - id: kubectl
+          image: gcr.io/direktiv/functions/kubectl:1.0
+          type: knative-workflow
+      x-direktiv-examples:
+      - title: Basic
+        content: "- id: kubectl\n  type: action\n  action:\n    secrets: [\"kubeconfig\"\
+          ]\n    function: kubectl\n    input: \n      kubeconfig: jq(.secrets.kubeconfig\
+          \ | @base64)\n      commands:\n      - command: kubectl version --client\
+          \ --output json"
+      - title: Advanced
+        content: "- id: kubectl\n  type: action\n  action:\n    secrets: [\"kubeconfig\"\
+          ]\n    function: kubectl\n    input: \n      kubeconfig: jq(.secrets.kubeconfig\
+          \ | @base64)\n      commands:\n      - command: kubectl get pods --output\
+          \ json\n  catch:\n  - error: \"*\""
+      x-direktiv-secrets:
+      - name: kubeconfig
+        description: Kubeconfig file as BASE64 encoded file for cluster access.
+      x-direktiv:
+        cmds:
+        - action: exec
+          exec: "bash -c 'mkdir -p ~/.kube/ && echo {{ .Kubeconfig }} | base64 -d\
+            \ > ~/.kube/config'"
+          silent: true
+          print: false
+        - action: foreach
+          loop: .Commands
+          exec: "{{ .Item.Command }}"
+          silent: "{{ .Item.Silent }}"
+          print: "{{ .Item.Print }}"
+          continue: "{{ .Item.Continue }}"
+        output: |
+          {
+            "kubectl": {{ index . 1 | toJson }}
+          }
+      x-direktiv-errors:
+        io.direktiv.command.error: Command execution failed
+        io.direktiv.output.error: Template error for output generation of the service
+        io.direktiv.ri.error: Can not create information object from request
+      x-codegen-request-body-name: body
+components:
+  schemas:
+    direktivFile:
+      type: object
+      x-go-type:
+        type: DirektivFile
+        import:
+          package: github.com/direktiv/apps/go/pkg/apps
+    error:
+      required:
+      - errorCode
+      - errorMessage
+      type: object
+      properties:
+        errorCode:
+          type: string
+        errorMessage:
+          type: string
